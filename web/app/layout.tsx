@@ -15,6 +15,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <nav style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <a href="/sources">Sources</a>
               <a href="/settings">Settings</a>
+              <a href="/login">Login</a>
             </nav>
           </aside>
           <main style={{ flex: 1, padding: 24 }}>{children}</main>
