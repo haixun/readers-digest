@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import SignOutButton from '@/components/SignOutButton';
+import SourcesClient from './SourcesClient';
 
 export default async function SourcesPage() {
   const supabase = createSupabaseServerClient();
@@ -14,7 +15,7 @@ export default async function SourcesPage() {
       <h1>Sources</h1>
       <p>Signed in as {data.user.email}</p>
       <SignOutButton />
-      <p>Manage your channels, blogs, and individual videos here.</p>
+      <SourcesClient />
     </section>
   );
 }

@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import SignOutButton from '@/components/SignOutButton';
+import SettingsClient from './SettingsClient';
 
 export default async function SettingsPage() {
   const supabase = createSupabaseServerClient();
@@ -14,8 +15,7 @@ export default async function SettingsPage() {
       <h1>Settings</h1>
       <p>Signed in as {data.user.email}</p>
       <SignOutButton />
-      <p>Configure default model, global prompt, and user overrides.</p>
-      <p>Next: wire this page to Supabase + Prisma settings API.</p>
+      <SettingsClient />
     </section>
   );
 }
