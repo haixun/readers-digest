@@ -67,6 +67,7 @@ model Video {
 model Transcript {
   videoId    String   @id
   blobKey    String
+  text       String?
   hash       String
   language   String?
   createdAt  DateTime @default(now())
