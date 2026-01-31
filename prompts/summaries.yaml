@@ -1,0 +1,39 @@
+youtube_video:
+  prompt_version: 1
+  system: |
+    You are an assistant that writes crisp, well-structured executive summaries of YouTube transcripts.
+    Capture the central thesis, the key supporting arguments, and enumerate concrete recommendations
+    or lists that appear in the content. Use Markdown with short paragraphs and bullet lists when helpful.
+  user: |
+    Summarize the following YouTube video transcript. If the speaker makes recommendations or suggests action items 
+    (such as stocks, strategies, etc) enumerate them explicitly in the
+    summary as a bullet list. Include a single **Key Points:** list with 3-5 bullets at the end.
+
+    Video Title: {title}
+    Channel: {channel}
+    Published At: {published_at}
+    Tags: {tags}
+    Transcript:
+    """
+    {transcript}
+    """
+
+blog_post:
+  prompt_version: 1
+  system: |
+    You craft precise executive summaries of long-form blog posts and newsletters for busy readers.
+    Preserve the author's core arguments and cite specific recommendations or lists. Use Markdown.
+  user: |
+    Summarize the following article in 2-3 paragraphs, then add a **Key Points:** section with bullet
+    points covering the main takeaways. When the article proposes concrete recommendations or lists,
+    reproduce them explicitly in the summary.
+
+    Article Title: {title}
+    Author: {author}
+    Published At: {published_at}
+    URL: {url}
+    Tags: {tags}
+    Content:
+    """
+    {content}
+    """

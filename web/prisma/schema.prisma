@@ -1,0 +1,134 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum SourceType {
+  youtube_channel
+  youtube_video
+  blog
+}
+
+enum SummaryScope {
+  global
+  user
+}
+
+enum PromptScope {
+  global
+  user
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String?  @unique
+  createdAt DateTime @default(now())
+
+  sources       Source[]
+  contentItems  ContentItem[]
+  summaries     Summary[]
+  settings      UserSettings?
+  prompts       Prompt[]
+}
+
+model Source {
+  id        String     @id @default(uuid())
+  userId    String
+  type      SourceType
+  url       String
+  title     String?
+  category  String?
+  tags      String[]   @default([])
+  createdAt DateTime   @default(now())
+
+  user        User        @relation(fields: [userId], references: [id])
+  contentItems ContentItem[]
+
+  @@unique([userId, type, url])
+}
+
+model Video {
+  videoId      String   @id
+  canonicalUrl String
+  title        String?
+  channelId    String?
+  channelName  String?
+  publishedAt  DateTime?
+  createdAt    DateTime @default(now())
+
+  transcript Transcript?
+  contentItems ContentItem[]
+}
+
+model Transcript {
+  videoId    String   @id
+  blobKey    String
+  hash       String
+  language   String?
+  createdAt  DateTime @default(now())
+
+  video Video @relation(fields: [videoId], references: [videoId])
+}
+
+model ContentItem {
+  id         String   @id @default(uuid())
+  userId     String
+  sourceId   String
+  videoId    String?
+  blogUrl    String?
+  title      String?
+  publishedAt DateTime?
+  status     String   @default("pending")
+  createdAt  DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  source Source @relation(fields: [sourceId], references: [id])
+  video  Video? @relation(fields: [videoId], references: [videoId])
+  summaries Summary[]
+
+  @@unique([userId, sourceId, videoId])
+}
+
+model Summary {
+  id          String       @id @default(uuid())
+  contentItemId String
+  userId      String?
+  scope       SummaryScope
+  cacheKey    String       @unique
+  promptHash  String
+  model       String
+  summaryText String
+  createdAt   DateTime     @default(now())
+
+  contentItem ContentItem @relation(fields: [contentItemId], references: [id])
+  user        User?       @relation(fields: [userId], references: [id])
+}
+
+model Prompt {
+  id           String      @id @default(uuid())
+  key          String
+  scope        PromptScope
+  userId       String?
+  system       String
+  user         String
+  modelOverride String?
+  promptVersion Int       @default(1)
+  updatedAt    DateTime   @updatedAt
+
+  owner User? @relation(fields: [userId], references: [id])
+
+  @@unique([key, scope, userId])
+}
+
+model UserSettings {
+  userId     String   @id
+  openaiApiKeyEncrypted String?
+  defaultModel String
+  updatedAt  DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}

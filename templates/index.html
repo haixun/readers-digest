@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-section">
+            <h2>Sources</h2>
+            <ul id="source-list" class="source-list"></ul>
+        </div>
+        <div class="sidebar-section" id="channel-section" style="display: none;">
+            <h3>Channels</h3>
+            <ul id="channel-list" class="channel-list"></ul>
+        </div>
+        <div class="sidebar-section" id="blog-section" style="display: none;">
+            <h3>Blog Sites</h3>
+            <ul id="blog-list" class="channel-list"></ul>
+        </div>
+        <div class="sidebar-section">
+            <label for="search-input">Search</label>
+            <input type="text" id="search-input" placeholder="Search title, author, or tags">
+        </div>
+        <div class="sidebar-section">
+            <h3>Overview</h3>
+            <div class="overview-compact">
+                <span>Total <strong id="stat-total">--</strong></span>
+                <span>Latest <strong id="stat-latest">--</strong></span>
+            </div>
+        </div>
+        <div class="sidebar-section">
+            <h3>Origin Breakdown</h3>
+            <ul id="stat-origins"></ul>
+        </div>
+    </aside>
+
+    <main class="content-panel">
+        <header class="content-header">
+            <div>
+                <h1 id="panel-title">All Sources</h1>
+                <p id="panel-subtitle" class="panel-subtitle"></p>
+            </div>
+            <div class="content-actions">
+                <button class="btn btn-secondary" id="refresh-btn" onclick="refreshData()">
+                    <i class="fas fa-sync-alt"></i>
+                    Refresh Now
+                </button>
+            </div>
+        </header>
+
+        <section class="settings-panel" id="settings-panel" style="display: none;">
+            <div class="settings-grid">
+                <div class="settings-card">
+                    <h2>OpenAI Settings</h2>
+                    <div class="settings-field">
+                        <label for="openai-api-key">API Key</label>
+                        <input type="password" id="openai-api-key" placeholder="sk-..." />
+                        <p class="settings-hint" id="openai-api-key-hint">Stored locally in data/user_settings.json.</p>
+                    </div>
+                    <div class="settings-field">
+                        <label for="openai-model">Model</label>
+                        <select id="openai-model">
+                            <option value="gpt-4.1-mini">gpt-4.1-mini</option>
+                            <option value="gpt-4.1">gpt-4.1</option>
+                            <option value="gpt-4o-mini">gpt-4o-mini</option>
+                            <option value="gpt-4o">gpt-4o</option>
+                            <option value="custom">Custom…</option>
+                        </select>
+                        <input type="text" id="openai-model-custom" placeholder="Enter model name" />
+                    </div>
+                    <div class="settings-actions">
+                        <span id="settings-status" class="prompt-status"></span>
+                        <button class="btn btn-primary" id="settings-save" type="button">Save Settings</button>
+                    </div>
+                </div>
+                <div class="settings-card">
+                    <div class="prompt-header">
+                        <h2>Summary Prompt</h2>
+                        <p>Use <code>{tags}</code> to pass item tags into the prompt.</p>
+                    </div>
+                    <div class="settings-field">
+                        <label for="prompt-key">Prompt Type</label>
+                        <select id="prompt-key"></select>
+                    </div>
+                    <div class="prompt-grid">
+                        <div class="prompt-field">
+                            <label for="prompt-system">System</label>
+                            <textarea id="prompt-system" rows="5"></textarea>
+                        </div>
+                        <div class="prompt-field">
+                            <label for="prompt-user">User</label>
+                            <textarea id="prompt-user" rows="7"></textarea>
+                        </div>
+                    </div>
+                    <div class="prompt-actions">
+                        <span id="prompt-status" class="prompt-status"></span>
+                        <button class="btn btn-primary" id="prompt-save" type="button">Save Prompt</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="summary-section">
+            <div id="summary-list" class="summary-list"></div>
+            <div id="empty-state" class="empty-state" style="display: none;">
+                <p>No items match your current selection.</p>
+            </div>
+        </section>
+    </main>
+</div>
+{% endblock %}
