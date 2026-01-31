@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { isAdminEmail } from '@/lib/auth';
 
 export async function GET() {
   const supabase = createSupabaseServerClient();
@@ -16,6 +17,7 @@ export async function GET() {
   return NextResponse.json({
     defaultModel: settings?.defaultModel ?? process.env.DEFAULT_MODEL ?? 'gpt-4.1-mini',
     hasApiKey: Boolean(settings?.openaiApiKeyEncrypted),
+    isAdmin: isAdminEmail(data.user.email),
   });
 }
 

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { isAdminEmail } from '@/lib/auth';
 
 const DEFAULT_PROMPTS: Record<string, { system: string; user: string }> = {
   youtube_video: {
@@ -29,11 +30,16 @@ export async function GET(_: Request, { params }: { params: { key: string } }) {
   const globalPrompt = await prisma.prompt.findUnique({
     where: { key_scope_userId: { key, scope: 'global', userId: null } }
   }).catch(() => null);
+  const userPrompt = await prisma.prompt.findUnique({
+    where: { key_scope_userId: { key, scope: 'user', userId: data.user.id } }
+  }).catch(() => null);
 
   return NextResponse.json({
     key,
     default: defaultPrompt,
     global: globalPrompt,
+    user: userPrompt,
+    isAdmin: isAdminEmail(data.user.email),
   });
 }
 
@@ -57,11 +63,30 @@ export async function POST(request: Request, { params }: { params: { key: string
     return NextResponse.json({ error: 'system and user required' }, { status: 400 });
   }
 
+  const scope = payload.scope === 'user' ? 'user' : 'global';
+  if (scope === 'global' && !isAdminEmail(data.user.email)) {
+    return NextResponse.json({ error: 'forbidden' }, { status: 403 });
+  }
+
   const prompt = await prisma.prompt.upsert({
-    where: { key_scope_userId: { key, scope: 'global', userId: null } },
+    where: { key_scope_userId: { key, scope, userId: scope === 'user' ? data.user.id : null } },
     update: { system, user, promptVersion: { increment: 1 } },
-    create: { key, scope: 'global', userId: null, system, user, promptVersion: 1 }
+    create: { key, scope, userId: scope === 'user' ? data.user.id : null, system, user, promptVersion: 1 }
   });
 
   return NextResponse.json({ prompt });
+}
+
+export async function DELETE(_: Request, { params }: { params: { key: string } }) {
+  const supabase = createSupabaseServerClient();
+  const { data } = await supabase.auth.getUser();
+  if (!data.user) {
+    return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  }
+
+  const key = params.key;
+  await prisma.prompt.deleteMany({
+    where: { key, scope: 'user', userId: data.user.id }
+  });
+  return NextResponse.json({ ok: true });
 }

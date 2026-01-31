@@ -91,6 +91,7 @@ model ContentItem {
   summaries Summary[]
 
   @@unique([userId, sourceId, videoId])
+  @@unique([userId, sourceId, blogUrl])
 }
 
 model Summary {

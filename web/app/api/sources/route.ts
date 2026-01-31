@@ -31,7 +31,8 @@ export async function POST(request: Request) {
   const category = payload.category ? String(payload.category).trim() : undefined;
   const tags = Array.isArray(payload.tags) ? payload.tags.map((t: string) => String(t).trim()).filter(Boolean) : [];
 
-  if (!type || !url) {
+  const allowed = new Set(['youtube_channel', 'youtube_video', 'blog']);
+  if (!type || !url || !allowed.has(type)) {
     return NextResponse.json({ error: 'type and url are required' }, { status: 400 });
   }
 
